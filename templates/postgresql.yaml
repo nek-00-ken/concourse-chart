@@ -1,0 +1,38 @@
+{{- if .Values.concourse.web.postgres.operator.enabled -}}
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: {{ template "concourse.postgresql.fullname" . }}
+  labels:
+    app: {{ template "concourse.web.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  teamId: "concourse"
+  volume:
+    size: {{ .Values.concourse.web.postgres.operator.volumeSize }}
+    storageClass: {{ .Values.concourse.web.postgres.operator.storageClass }}
+  enableMasterLoadBalancer: false
+  enableReplicaLoadBalancer: false
+  numberOfInstances: 2
+  {{- if .Values.concourse.web.postgres.operator.resources }}
+  resources: {{- toYaml .Values.concourse.web.postgres.operator.resources | nindent 4 }}
+  {{- end }}
+  patroni:
+    initdb:
+      encoding: "UTF8"
+      locale: "en_US.UTF-8"
+      data-checksums: "true"
+    pg_hba:
+      - hostssl all all 0.0.0.0/0 md5
+      - host    all all 0.0.0.0/0 md5
+  users:
+    concourse:
+      - superuser
+      - createdb
+  databases:
+    concourse: concourse
+  postgresql:
+    version: "11"
+{{- end -}}

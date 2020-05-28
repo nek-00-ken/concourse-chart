@@ -346,6 +346,11 @@ concourse:
     ## instance.
     ##
     postgres:
+      operator:
+        enabled: false
+        volumeSize: 50Gi
+        storageClass: default
+
       ## The host to connect to.
       ##
       host:

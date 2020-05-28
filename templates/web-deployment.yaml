@@ -371,6 +371,21 @@ spec:
                   key: postgresql-password
             - name: CONCOURSE_POSTGRES_DATABASE
               value: {{ .Values.postgresql.postgresqlDatabase | quote }}
+            {{- else if .Values.concourse.web.postgres.operator.enabled }}
+            - name: CONCOURSE_POSTGRES_HOST
+              value: {{ template "concourse.postgresql.fullname" . }}
+            - name: CONCOURSE_POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: concourse.{{ template "concourse.postgresql.fullname" . }}.credentials
+                  key: username
+            - name: CONCOURSE_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: concourse.{{ template "concourse.postgresql.fullname" . }}.credentials
+                  key: password
+            - name: CONCOURSE_POSTGRES_DATABASE
+              value: concourse
             {{- else }}
             {{- if .Values.concourse.web.postgres.host }}
             - name: CONCOURSE_POSTGRES_HOST
