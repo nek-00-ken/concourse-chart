@@ -22,6 +22,10 @@ spec:
     metricRelabelings:
       {{ toYaml .Values.concourse.web.prometheus.serviceMonitor.metricRelabelings | nindent 6 }}
   {{- end }}
+  {{- if .Values.concourse.web.prometheus.serviceMonitor.relabelings }}
+    relabelings:
+      {{ toYaml .Values.concourse.web.prometheus.serviceMonitor.relabelings | nindent 6 }}
+  {{- end }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
