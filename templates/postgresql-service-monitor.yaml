@@ -1,0 +1,48 @@
+{{- if and .Values.concourse.web.postgres.operator.enabled .Values.concourse.web.postgres.operator.serviceMonitor.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-exporter
+  labels:
+    app: pg-exporter
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  ports:
+    - name: exporter
+      port: 9187
+      targetPort: exporter
+  selector:
+    application: spilo
+    team: concourse
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postgresql
+  labels:
+    app: pg-exporter
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    {{- with .Values.concourse.web.postgres.operator.serviceMonitor.labels }}
+{{ toYaml . | trim | indent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+  - interval: {{ .Values.concourse.web.postgres.operator.serviceMonitor.interval }}
+    path: /metrics
+    port: exporter
+    {{- if .Values.concourse.web.postgres.operator.serviceMonitor.relabelings }}
+    relabelings: {{ toYaml .Values.concourse.web.postgres.operator.serviceMonitor.relabelings | nindent 6 }}
+    {{- end }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app: pg-exporter
+{{- end }}

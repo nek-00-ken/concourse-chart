@@ -350,6 +350,12 @@ concourse:
         enabled: false
         volumeSize: 50Gi
         storageClass: default
+        # Postgresql service monitor (optional, default: true)
+        serviceMonitor:
+          enabled: true
+          interval: 30s
+          labels: {}
+          relabelings:
 
       ## The host to connect to.
       ##
