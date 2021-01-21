@@ -29,7 +29,7 @@ spec:
       - host    all all 0.0.0.0/0 md5
     maximum_lag_on_failover: 0
     synchronous_mode: true
-    synchronous_mode_strict: true
+    synchronous_mode_strict: false
   users:
     concourse:
       - superuser
